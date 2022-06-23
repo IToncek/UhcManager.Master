@@ -1,0 +1,4 @@
+name: Master
+version: '${project.version}'
+main: me.itoncek.uhccore.master.Master
+api-version: 1.19
