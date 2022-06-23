@@ -1,0 +1,33 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Build and Release
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  publish_release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Build with Maven
+        run: mvn -B clean package --file pom.xml
+      - name: Create release
+        id: create_release
+        run: |
+          set -xe
+          RELDATE="$(date +'%Y-%m-%d %H:%M')"
+          NAME="Auto-Build $RELDATE"
+          TAGNAME="autobuild-$(date +'%Y-%m-%d-%H-%M')"
+          hub release create -a target/master-.jar -m "$NAME" -t "main" "$TAGNAME"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
